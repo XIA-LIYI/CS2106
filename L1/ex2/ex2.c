@@ -29,11 +29,11 @@ int main()
     int position, input, copy;
 
     //Fill in code for input and processing
-    while (scanf("%i %i %i", &position, &input, &copy) == 1) {
+    while (scanf("%i %i %i", &position, &input, &copy) == 3) {
     	printf("%i %i %i", position, input, copy);
-	    myList = insertAt(myList, position, copy, input);
-    }
-    
+	myList = insertAt(myList, position, copy, input);
+    }  
+
     //Output code coded for you
     printf("My List:\n");
     printList(myList);
@@ -55,19 +55,51 @@ node* insertAt(node* head, int position, int copies, int newValue)
     
     node* ptr = head;
     int index = 0;
-    while (index != position) {
+    if (position == 0 || head == NULL) {
+    	int copy = 0;
+	while (copy < copies) {
+	    copy++;
+	    node* now = malloc(sizeof(node));
+	    now->data = newValue;
+	    now->next = ptr;
+	    ptr = now;
+	}
+	return ptr;
+    }
+
+    node* prev = ptr;
+    while (index < position - 1 && ptr != NULL) {
     	index++;
+	prev = ptr;
 	ptr = ptr->next;
     }
+    node* last = ptr;
+    if (ptr == NULL) {
+    	int copy = 0;
+	ptr = NULL;
+	while (copy < copies) {
+	    copy++;
+	    node* now = malloc(sizeof(node));
+	    now->data = newValue;
+	    now->next = ptr;
+	    ptr = now;
+	}
+	prev->next = ptr;
+	return head;
+    }
+    
+    ptr = ptr->next;
     int copy = 0;
-    while (copies != copy) {
-    	copy++;
+    while (copy < copies) {
+	copy++;
 	node* now = malloc(sizeof(node));
 	now->data = newValue;
 	now->next = ptr;
 	ptr = now;
     }
-    return ptr;    //change this!
+    last->next = ptr;
+    
+    return head;    //change this!
 }	
  
 void printList(node* head)
