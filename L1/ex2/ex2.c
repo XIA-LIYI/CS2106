@@ -26,10 +26,14 @@ void destroyList(node*);
 int main()
 {
     node* myList = NULL;    //Empty List
-    int position, input;
+    int position, input, copy;
 
     //Fill in code for input and processing
-
+    while (scanf("%i %i %i", &position, &input, &copy) == 1) {
+    	printf("%i %i %i", position, input, copy);
+	    myList = insertAt(myList, position, copy, input);
+    }
+    
     //Output code coded for you
     printf("My List:\n");
     printList(myList);
@@ -48,8 +52,23 @@ int main()
 node* insertAt(node* head, int position, int copies, int newValue)
 {
     //Fill in your code here
-    return NULL;    //change this!
-}
+    
+    node* ptr = head;
+    int index = 0;
+    while (index != position) {
+    	index++;
+	ptr = ptr->next;
+    }
+    int copy = 0;
+    while (copies != copy) {
+    	copy++;
+	node* now = malloc(sizeof(node));
+	now->data = newValue;
+	now->next = ptr;
+	ptr = now;
+    }
+    return ptr;    //change this!
+}	
  
 void printList(node* head)
 //Purpose: Print out the linked list content
