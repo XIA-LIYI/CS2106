@@ -116,9 +116,16 @@ void printList(node* head)
     printf("\n");
 }
 
+
 void destroyList(node* head)
 {
-     
     //Fill in your code here
-    //You can use the same implementation as in exercise 1
+    
+    node* ptr = head;
+    while (ptr != NULL) {
+    	node* now = ptr;
+	ptr = ptr->next;
+	free(now);
+    }
+    free(ptr);
 }
