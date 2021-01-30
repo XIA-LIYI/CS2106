@@ -86,5 +86,4 @@ void destroyList(node* head)
 	ptr = ptr->next;
 	free(now);
     }
-    free(ptr);
 }
