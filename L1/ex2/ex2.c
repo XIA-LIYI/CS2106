@@ -60,7 +60,7 @@ node* insertAt(node* head, int position, int copies, int newValue)
 	prev = curr;
 	curr = curr->next;
     }
-    if (prev == NULL && curr == NULL) {
+    if (prev == NULL || position == 0) {
 	for (int i = 0; i < copies; i++) {
 	    node* new = malloc(sizeof(node));
 	    new -> data = newValue;
@@ -75,9 +75,7 @@ node* insertAt(node* head, int position, int copies, int newValue)
 	    new -> next = curr;
 	    curr = new;
 	}
-	if (position == 0) {
-	    return curr;
-	}
+	
 	prev -> next = curr;
 	return head;
     }
