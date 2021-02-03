@@ -1,9 +1,17 @@
 /*************************************
 * Lab 1 Exercise 3
-* Name     :
-* Matric No:
-* Lab Group:
+* Name     : Xia Liyi
+* Matric No: A0177873L
+* Lab Group: B19
 *************************************/
+
+/*************************************
+* Lab 1 Exercise 3
+* Name     : Zhang Yunjie
+* Matric No: A0204208U
+* Lab Group: B09
+*************************************/
+
 
 #include <stdio.h>
 #include <math.h>
@@ -25,7 +33,6 @@ int main() {
     //   - it points to afunction that takes (int, int) as parameter
     //   - and returns int as return result
 
-    arithFuncPtr ptr1, ptr2, ptr3, ptr4;
 
     //ptr points to the function add
     ptr1 = ap;
@@ -33,8 +40,8 @@ int main() {
     ptr3 = removeFactor;
     ptr4 = power;
 
-    arithFuncPtr ptrArray[4] = {ptr1,ptr2,ptr3,ptr4};
-    char printArray[4][15] = {"lumos", "alohomora", "expelliarmus", "sonorus"};
+    arithFuncPtr ptrArray[4] = {ap,gcd,removeFactor,power};
+    char printArray[4][13] = {"lumos", "alohomora", "expelliarmus", "sonorus"};
     
     while (scanf("%i %i %i", &optype, &a, &b) == 3) {
         res = (*ptrArray[optype - 1])(a, b);
@@ -57,9 +64,8 @@ int power(int base, int power) {
     return pow(base,power);
 }
 
-int ap(int firstNum, int lastNum) { //arithmetic progression
-    int n = lastNum - firstNum;
-    return (n + 1) * firstNum + (n + 1) * n / 2;
+int ap(int x, int y) { //arithmetic progression
+    return (x + y) * (y - x + 1) / 2;
 } 
 
 int removeFactor(int num, int factor) {
