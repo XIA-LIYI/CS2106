@@ -29,16 +29,9 @@ int power(int x, int y);
 int main() {
     int a, b, optype, res;
 
-//arithFuncPtr is a function pointer datatype
+    //arithFuncPtr is a function pointer datatype
     //   - it points to afunction that takes (int, int) as parameter
     //   - and returns int as return result
-
-
-    //ptr points to the function add
-    ptr1 = ap;
-    ptr2 = gcd;
-    ptr3 = removeFactor;
-    ptr4 = power;
 
     arithFuncPtr ptrArray[4] = {ap,gcd,removeFactor,power};
     char printArray[4][13] = {"lumos", "alohomora", "expelliarmus", "sonorus"};
