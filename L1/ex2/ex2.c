@@ -1,12 +1,12 @@
 /*************************************
-* Lab 1 Exercise 3
+* Lab 1 Exercise 2
 * Name     : Xia Liyi
 * Matric No: A0177873L
 * Lab Group: B19
 *************************************/
 
 /*************************************
-* Lab 1 Exercise 3
+* Lab 1 Exercise 2
 * Name     : Zhang Yunjie
 * Matric No: A0204208U
 * Lab Group: B09
