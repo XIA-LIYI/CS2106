@@ -54,8 +54,8 @@ int gcd(int x, int y) {
 
 int power(int base, int power) {
     int res = 1;
-    for (int i = 0; i < y; i++) {
-    	res = res * x;
+    for (int i = 0; i < power; i++) {
+    	res = res * base;
     }
     return res;
 }
