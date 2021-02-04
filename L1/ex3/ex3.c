@@ -14,7 +14,6 @@
 
 
 #include <stdio.h>
-#include <math.h>
 
 //Datatype Declarations
 typedef int (*arithFuncPtr)(int, int);
@@ -54,7 +53,11 @@ int gcd(int x, int y) {
 }
 
 int power(int base, int power) {
-    return pow(base,power);
+    int res = 1;
+    for (int i = 0; i < y; i++) {
+    	res = res * x;
+    }
+    return res;
 }
 
 int ap(int x, int y) { //arithmetic progression
