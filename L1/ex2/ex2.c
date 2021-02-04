@@ -1,8 +1,15 @@
 /*************************************
-* Lab 1 Exercise 1
-* Name:
-* Matric No:
-* Lab Group:
+* Lab 1 Exercise 3
+* Name     : Xia Liyi
+* Matric No: A0177873L
+* Lab Group: B19
+*************************************/
+
+/*************************************
+* Lab 1 Exercise 3
+* Name     : Zhang Yunjie
+* Matric No: A0204208U
+* Lab Group: B09
 *************************************/
 
 #include <stdio.h>
