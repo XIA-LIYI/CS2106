@@ -25,7 +25,20 @@ int main()
     scanf("%d", &nChild);
 
     //Spawn child processes
-
+    for (int i = 1; i <= nChild; i++) {
+    	int id;
+	id = fork();
+	if (id == 0 ) {
+	    printf("Child %i[%i]: Hello!\n", i, getpid());
+	    sleep(1);
+	    exit(0);
+	} else {
+	    int pr;
+	    pr = waitpid(id, NULL, 0);
+   	    printf("Parent: Child %i[%i] done.\n", i, id);
+	}
+    }
+    printf("Parent: Exiting.");
     //Wait on child processes in order
      
     return 0;
