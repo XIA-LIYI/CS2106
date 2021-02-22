@@ -110,23 +110,29 @@ int main()
     //At this point you have the user input split neatly into token in cmdLineArg[]
 
     while ( strcmp( cmdLineArgs[0], "quit") != 0 ){
-	int id = fork();
+	
         //Figure out which command the user want and implement below
-	if (id == 0) {
-	    int res = 0;
-	    if (strcmp(cmdLineArgs[0], "showpath") == 0) {
-	        printf("%s", path);
-	    } else if (strcmp(cmdLineArgs[0], "setpath") == 0) {
-	        path = cmdLineArgs[0];
-            
-	    }
-	    res = execl(path + , cmdLineArgs[0], NULL);
-	    printf("%i\n", res);
-	    exit(1);
-	} else {
-	    waitpid(id, NULL, 0);
-	}
-
+        if (strcmp(cmdLineArgs[0], "showpath") == 0) {
+            printf("%s\n", path);
+        } else if (strcmp(cmdLineArgs[0], "setpath") == 0) {
+            strcpy(path, cmdLineArgs[1]);
+        } else {
+            int id = fork();
+            if (id == 0) {
+                int res = 0;
+                char runCommand[] = "";
+                strcat(runCommand, path);
+                strcat(runCommand, "/");
+                strcat(runCommand, cmdLineArgs[0]);
+                res = execl(runCommand, cmdLineArgs[0], NULL);
+                if (res == -1) {
+                    printf("\"%s\" not found\n", runCommand);
+                }
+                exit(1);
+            } else {
+                waitpid(id, NULL, 0);
+            }
+        }
         //Prepare for next round input
 
         //Clean up the token array as it is dynamically allocated
