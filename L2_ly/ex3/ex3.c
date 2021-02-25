@@ -15,7 +15,7 @@ compute cluster node (Linux on x86)
 #include <fcntl.h>      //For stat()
 #include <sys/types.h>   
 #include <sys/stat.h>
-//#include <sys/wait.h>   //for waitpid()
+#include <sys/wait.h>   //for waitpid()
 #include <unistd.h>     //for fork(), wait()
 #include <string.h>     //for string comparison etc
 #include <stdlib.h>     //for malloc()
@@ -85,6 +85,50 @@ void freeTokenArray(char** strArr, int size)
     //      afterwards
 }
 
+void makeArgsList(char *argsList[], char **cmdLineArgs, int num) {
+    for (int i = 0; i < num; i++) {
+        if (strcmp(cmdLineArgs[i], "&") != 0) {
+            argsList[i] = cmdLineArgs[i];
+        }
+    }
+    argsList[num] = NULL;
+}
+
+void pc(int pids[10]) {
+    printf("Unwaited Child Processes:\n");
+    for (int i = 0; i < 10; i++) {
+        if (pids[i] != 0) {
+            printf("%i\n", pids[i]);
+        }
+    }
+}
+
+void add_pid(int pids[10], int pid) {
+    printf("Here");
+    for (int i = 0; i< 10; i++) {
+        if (pids[i] == 0) {
+            pids[i] = pid;
+            break;
+        }
+    }
+}
+
+void remove_pid(int pids[10], int pid) {
+    for (int i = 0; i < 10; i++) {
+        if (pids[i] == pid) {
+            pids[i] = 0;
+        }
+    }
+}
+
+int check_pid(int pids[10], int pid) {
+    for (int i = 0; i < 10; i++) {
+        if (pids[i] == pid) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 int main()
 {
@@ -106,10 +150,73 @@ int main()
 
     //At this point you have the user input split neatly into token in cmdLineArg[]
 
+    int pids[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int fd[2];
+    int *result;
+
     while ( strcmp( cmdLineArgs[0], "quit") != 0 ){
 
         //Figure out which command the user want and implement below
+        if (strcmp(cmdLineArgs[0], "showpath") == 0) {
+            printf("%s\n", path);
+        } else if (strcmp(cmdLineArgs[0], "setpath") == 0) {
+            strcpy(path, cmdLineArgs[1]);
+        } else if (strcmp(cmdLineArgs[0], "wait") == 0) {
+            int pid = atoi(cmdLineArgs[1]);
+            if (check_pid(pids, pid) == 1) {
+                remove_pid(pids, pid);
+                waitpid(pid, result, 0);
+            } else {
+                printf("%i not a valid child pid\n", pid);
+            }
+        } else if (strcmp(cmdLineArgs[0], "pc") == 0) {
+            pc(pids);
+        } else if (strcmp(cmdLineArgs[0], "result") == 0) {
+            printf("%i\n", WEXITSTATUS(*result));   
+        } else if (strcmp(cmdLineArgs[tokenNum - 1], "&") == 0) {
+            int pid = fork();
+            add_pid(pids, pid);
+            if (pid == 0) {
+                char runCommand[] = "";
+                int res;
 
+                strcat(runCommand, path);
+                strcat(runCommand, "/");
+                strcat(runCommand, cmdLineArgs[0]);
+                char *argsList[tokenNum];
+                makeArgsList(argsList, cmdLineArgs, tokenNum);
+
+                res = execv(runCommand, argsList);
+                if (res == -1) {
+                    printf("\"%s\" not found\n", runCommand);
+                }
+                
+                exit(1);
+            }
+        } else {
+
+            int pid = fork();
+            if (pid == 0) {
+                char runCommand[] = "";
+                int res;
+
+                strcat(runCommand, path);
+                strcat(runCommand, "/");
+                strcat(runCommand, cmdLineArgs[0]);
+                char *argsList[tokenNum + 1];
+                makeArgsList(argsList, cmdLineArgs, tokenNum);
+
+                res = execv(runCommand, argsList);
+
+                if (res == -1) {
+                    printf("\"%s\" not found\n", runCommand);
+                }
+
+                exit(1);
+            } else {
+                waitpid(pid, result, 0);
+            }
+        }
 
         //Prepare for next round input
 
