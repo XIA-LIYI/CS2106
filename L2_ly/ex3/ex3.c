@@ -104,7 +104,6 @@ void pc(int pids[10]) {
 }
 
 void add_pid(int pids[10], int pid) {
-    printf("Here");
     for (int i = 0; i< 10; i++) {
         if (pids[i] == 0) {
             pids[i] = pid;
@@ -152,7 +151,7 @@ int main()
 
     int pids[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int fd[2];
-    int *result;
+    int result;
 
     while ( strcmp( cmdLineArgs[0], "quit") != 0 ){
 
@@ -165,17 +164,18 @@ int main()
             int pid = atoi(cmdLineArgs[1]);
             if (check_pid(pids, pid) == 1) {
                 remove_pid(pids, pid);
-                waitpid(pid, result, 0);
+                waitpid(pid, &result, 0);
             } else {
                 printf("%i not a valid child pid\n", pid);
             }
         } else if (strcmp(cmdLineArgs[0], "pc") == 0) {
             pc(pids);
         } else if (strcmp(cmdLineArgs[0], "result") == 0) {
-            printf("%i\n", WEXITSTATUS(*result));   
+            printf("%i\n", WEXITSTATUS(result));   
         } else if (strcmp(cmdLineArgs[tokenNum - 1], "&") == 0) {
             int pid = fork();
             add_pid(pids, pid);
+            printf("Child %i in background\n", pid);
             if (pid == 0) {
                 char runCommand[] = "";
                 int res;
@@ -190,8 +190,6 @@ int main()
                 if (res == -1) {
                     printf("\"%s\" not found\n", runCommand);
                 }
-                
-                exit(1);
             }
         } else {
 
@@ -211,10 +209,8 @@ int main()
                 if (res == -1) {
                     printf("\"%s\" not found\n", runCommand);
                 }
-
-                exit(1);
             } else {
-                waitpid(pid, result, 0);
+                waitpid(pid, &result, 0);
             }
         }
 
