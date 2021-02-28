@@ -108,11 +108,11 @@ int main() {
 
     //At this point you have the user input split neatly into token in cmdLineArg[]
 
-    while ( strcmp( cmdLineArgs[0], "quit") != 0 ){
+    while (strcmp( cmdLineArgs[0], "quit") != 0 ){
 
         //Figure out which command the user want and implement below
         if (strcmp(cmdLineArgs[0], "showpath") == 0) {
-            printf("%s/n", path);
+            printf("%s\n", path);
         } else if (strcmp(cmdLineArgs[0], "setpath") == 0) {
             strcpy(path, cmdLineArgs[1]);
         } else {
@@ -124,11 +124,12 @@ int main() {
             struct stat buffer;
             int exist = stat(filename,&buffer);
             if (exist == -1) {
-                printf("%s not found\n", cmdLineArgs[0]);
+                printf("\"%s\" not found\n", filename);
             } else {
                 int pid =  fork();
                 if (pid == 0) {
                     execl(filename, cmdLineArgs[0], NULL);
+                    exit(1);
                 } else {
                     waitpid(pid,NULL,0);
                 }
@@ -149,7 +150,6 @@ int main() {
 
     //Clean up the token array as it is dynamically allocated
     freeTokenArray(cmdLineArgs, tokenNum);
-
 
     return 0;
 
