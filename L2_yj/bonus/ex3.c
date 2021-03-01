@@ -141,7 +141,6 @@ void myOwnHandler(int signo)
             printf("Nothing to kill.\n");
         }
     }
-
 }
 
 int main()
@@ -191,36 +190,6 @@ int main()
             pc(pids);
         } else if (strcmp(cmdLineArgs[0], "result") == 0) {
             printf("%i\n", WEXITSTATUS(result));   
-        } else if (strcmp(cmdLineArgs[tokenNum - 1], "&") == 0) {
-            char runCommand[100] = "";
-            struct stat buf;
-
-            strcat(runCommand, path);
-            strcat(runCommand, "/");
-            strcat(runCommand, cmdLineArgs[0]);
-
-            int fileExsits = stat(runCommand, &buf);
-            if (fileExsits == 0) {
-                int pid = fork();
-                if (pid == 0) {
-                    setsid();
-                    char *argsList[tokenNum];
-                    makeArgsList(argsList, cmdLineArgs, tokenNum - 1);
-                    int res = execv(runCommand, argsList);
-                    if (res == -1) {
-                        printf("The command fails to run due to some unknown reasons.\n");    
-                    }
-                    exit(1);
-                } else {
-                    add_pid(pids, pid);
-                    printf("Child %i in background\n", pid);
-                    
-                }
-            } else {
-                printf("\"%s\" not found\n", runCommand);
-            }
-
-
         } else {
             char runCommand[100] = "";
             struct stat buf;
@@ -263,7 +232,7 @@ int main()
                         is_running= 0;
                     }
                  }
-            }
+             }
         }
 
         //Prepare for next round input
