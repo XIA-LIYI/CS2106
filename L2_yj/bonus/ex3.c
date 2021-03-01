@@ -167,7 +167,7 @@ int main()
     //At this point you have the user input split neatly into token in cmdLineArg[]
 
     int result;
-    int pids[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int pids[10] = {0};
 
     while ( strcmp( cmdLineArgs[0], "quit") != 0 ){
 
@@ -230,24 +230,39 @@ int main()
             strcat(runCommand, cmdLineArgs[0]);
 
             int fileExsits = stat(runCommand, &buf);
-            if (fileExsits == 0) {
+            if (fileExsits == -1) {
+                printf("\"%s\" not found\n", runCommand);
+            } else {
                 int pid = fork();
-                if (pid == 0) {
-                    char *argsList[tokenNum + 1];
-                    makeArgsList(argsList, cmdLineArgs, tokenNum);
-
-                    int res = execv(runCommand, argsList);
-
-                    if (res == -1) {
-                        printf("The command fails to run due to some unknown reasons.");
+                if (strcmp(cmdLineArgs[tokenNum - 1], "&") == 0) {
+                    if (pid == 0) {
+                        setsid();
+                        char *argsList[tokenNum];
+                        makeArgsList(argsList, cmdLineArgs, tokenNum - 1);
+                        int res = execv(runCommand, argsList);
+                        if (res == -1) {
+                            printf("The command fails to run due to some unknown reasons.\n");    
+                        }
+                        exit(1);
+                    } else {
+                        add_pid(pids, pid);
+                        printf("Child %i in background\n", pid);
+                    
                     }
                 } else {
-                    is_running = 1;
-                    waitpid(pid, &result, 0);
-                    is_running= 0;
-                }
-            } else {
-                printf("\"%s\" not found\n", runCommand);
+                    if (pid == 0) {
+                        char *argsList[tokenNum + 1];
+                        makeArgsList(argsList, cmdLineArgs, tokenNum);
+                        int res = execv(runCommand, argsList);
+                        if (res == -1) {
+                            printf("The command fails to run due to some unknown reasons.\n");
+                        }
+                    } else {
+                        is_running = 1;
+                        waitpid(pid, &result, 0);
+                        is_running= 0;
+                    }
+                 }
             }
         }
 
