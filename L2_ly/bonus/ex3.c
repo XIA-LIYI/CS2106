@@ -203,7 +203,8 @@ int main()
             if (fileExsits == 0) {
                 int pid = fork();
                 if (pid == 0) {
-                    setsid();
+                    // setsid();
+                    setpgid(0, 0);
                     char *argsList[tokenNum];
                     makeArgsList(argsList, cmdLineArgs, tokenNum - 1);
                     int res = execv(runCommand, argsList);
