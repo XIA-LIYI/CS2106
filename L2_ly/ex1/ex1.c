@@ -16,6 +16,7 @@ compute cluster node (Linux on x86)
 #include <sys/stat.h>
 #include <unistd.h>     //for fork()
 #include <sys/wait.h>   //for wait()
+#include <stdlib.h>
 
 int main()
 {
@@ -23,22 +24,24 @@ int main()
 
     //Read the number of child
     scanf("%d", &nChild);
+	int childID[nChild];
 
     //Spawn child processes
-    for (int i = 1; i <= nChild; i++) {
+    for (int i = 0; i < nChild; i++) {
     	int id;
-	id = fork();
-	if (id == 0 ) {
-	    printf("Child %i[%i]: Hello!\n", i, getpid());
-	    sleep(1);
-	    exit(0);
-	} else {
-	    int pr;
-	    pr = waitpid(id, NULL, 0);
-   	    printf("Parent: Child %i[%i] done.\n", i, id);
-	}
+		childID[i] = fork();
+		if (childID[i] == 0 ) {
+			sleep(4);
+			printf("Child %i[%i]: Hello!\n", i + 1, getpid());
+			
+			exit(0);
+		}
     }
-    printf("Parent: Exiting.");
+	for (int i = 0; i < nChild; i++) {
+		int pid = waitpid(childID[i], 0, 0);
+        printf("Parent: Child %i[%i] done.\n",i + 1, pid);
+	}
+    printf("Parent: Exiting.\n");
     //Wait on child processes in order
      
     return 0;
