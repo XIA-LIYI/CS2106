@@ -29,18 +29,17 @@ int main()
     //Spawn child processes
     for (int i = 0; i < nChild; i++) {
     	int id;
-		childID[i] = fork();
-		if (childID[i] == 0 ) {
-			sleep(4);
-			printf("Child %i[%i]: Hello!\n", i + 1, getpid());
-			
-			exit(0);
-		}
-    }
-	for (int i = 0; i < nChild; i++) {
-		int pid = waitpid(childID[i], 0, 0);
-        printf("Parent: Child %i[%i] done.\n",i + 1, pid);
+	childID[i] = fork();
+	if (childID[i] == 0 ) {
+	    sleep(4);
+	    printf("Child %i[%i]: Hello!\n", i + 1, getpid());
+	    exit(0);
 	}
+    }
+    for (int i = 0; i < nChild; i++) {
+	int pid = waitpid(childID[i], 0, 0);
+        printf("Parent: Child %i[%i] done.\n",i + 1, pid);
+    }
     printf("Parent: Exiting.\n");
     //Wait on child processes in order
      
