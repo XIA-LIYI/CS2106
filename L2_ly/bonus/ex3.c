@@ -1,9 +1,16 @@
 /*************************************
-* Lab 2 Exercise 3
-* Name:
-* Student Id: A????????
-* Lab Group: B??
-*************************************
+ * * Lab 2 Exercise 3
+ * * Name     : Xia Liyi
+ * * Matric No: A0177873L
+ * * Lab Group: B19
+ * *************************************/
+
+/*************************************
+ * * Lab 2 Exercise 3
+ * * Name     : Zhang Yunjie
+ * * Matric No: A0204208U
+ * * Lab Group: B09
+ * *************************************/
 Note: Duplicate the above and fill in 
 for the 2nd member if  you are on a team
 --------------------------------------
