@@ -1,9 +1,16 @@
 /*************************************
-* Lab 2 Exercise 3
-* Name:
-* Student Id: A????????
-* Lab Group: B??
-*************************************
+ * * Lab 2 Exercise 3
+ * * Name     : Xia Liyi
+ * * Matric No: A0177873L
+ * * Lab Group: B19
+ * *************************************/
+
+/*************************************
+ * * Lab 2 Exercise 3
+ * * Name     : Zhang Yunjie
+ * * Matric No: A0204208U
+ * * Lab Group: B09
+ * *************************************/
 Note: Duplicate the above and fill in 
 for the 2nd member if  you are on a team
 --------------------------------------
@@ -20,6 +27,9 @@ compute cluster node (Linux on x86)
 #include <string.h>     //for string comparison etc
 #include <stdlib.h>     //for malloc()
 
+
+int waiting_pid = 0;
+int is_running = 0;
 
 char** split( char* input, char* delimiter, int maxTokenNum, int* readTokenNum )
 //Assumptions:
@@ -129,6 +139,18 @@ int check_pid(int pids[10], int pid) {
     return 0;
 }
 
+void myOwnHandler(int signo)
+{
+    if (signo == SIGINT){
+        if (waiting_pid != 0) {
+            kill(waiting_pid, 2);
+        } else if (is_running == 0) {
+            printf("Nothing to kill.\n");
+        }
+    }
+
+}
+
 int main()
 {
     char **cmdLineArgs;
@@ -136,6 +158,8 @@ int main()
     char userInput[121];
 
     int tokenNum;
+
+    signal(SIGINT, myOwnHandler);
 
     //read user input
     printf("YWIMC > ");
@@ -149,11 +173,11 @@ int main()
 
     //At this point you have the user input split neatly into token in cmdLineArg[]
 
-    int pids[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int fd[2];
     int result;
+    int pids[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     while ( strcmp( cmdLineArgs[0], "quit") != 0 ){
+
 
         //Figure out which command the user want and implement below
         if (strcmp(cmdLineArgs[0], "showpath") == 0) {
@@ -164,7 +188,9 @@ int main()
             int pid = atoi(cmdLineArgs[1]);
             if (check_pid(pids, pid) == 1) {
                 remove_pid(pids, pid);
+                waiting_pid = pid;
                 waitpid(pid, &result, 0);
+                waiting_pid = 0;
             } else {
                 printf("%i not a valid child pid\n", pid);
             }
@@ -173,44 +199,63 @@ int main()
         } else if (strcmp(cmdLineArgs[0], "result") == 0) {
             printf("%i\n", WEXITSTATUS(result));   
         } else if (strcmp(cmdLineArgs[tokenNum - 1], "&") == 0) {
-            int pid = fork();
-            add_pid(pids, pid);
-            printf("Child %i in background\n", pid);
-            if (pid == 0) {
-                char runCommand[] = "";
-                int res;
+            char runCommand[100] = "";
+            struct stat buf;
 
-                strcat(runCommand, path);
-                strcat(runCommand, "/");
-                strcat(runCommand, cmdLineArgs[0]);
-                char *argsList[tokenNum];
-                makeArgsList(argsList, cmdLineArgs, tokenNum);
+            strcat(runCommand, path);
+            strcat(runCommand, "/");
+            strcat(runCommand, cmdLineArgs[0]);
 
-                res = execv(runCommand, argsList);
-                if (res == -1) {
-                    printf("\"%s\" not found\n", runCommand);
-                }
-            }
-        } else {
-
-            int pid = fork();
-            if (pid == 0) {
-                char runCommand[] = "";
-                int res;
-
-                strcat(runCommand, path);
-                strcat(runCommand, "/");
-                strcat(runCommand, cmdLineArgs[0]);
-                char *argsList[tokenNum + 1];
-                makeArgsList(argsList, cmdLineArgs, tokenNum);
-
-                res = execv(runCommand, argsList);
-
-                if (res == -1) {
-                    printf("\"%s\" not found\n", runCommand);
+            int fileExsits = stat(runCommand, &buf);
+            if (fileExsits == 0) {
+                int pid = fork();
+                if (pid == 0) {
+                    // setsid();
+                    setpgid(0, 0);
+                    char *argsList[tokenNum];
+                    makeArgsList(argsList, cmdLineArgs, tokenNum - 1);
+                    int res = execv(runCommand, argsList);
+                    if (res == -1) {
+                        printf("The command fails to run due to some unknown reasons.\n");    
+                    }
+                    exit(1);
+                } else {
+                    add_pid(pids, pid);
+                    printf("Child %i in background\n", pid);
+                    
                 }
             } else {
-                waitpid(pid, &result, 0);
+                printf("\"%s\" not found\n", runCommand);
+            }
+
+
+        } else {
+            char runCommand[100] = "";
+            struct stat buf;
+
+            strcat(runCommand, path);
+            strcat(runCommand, "/");
+            strcat(runCommand, cmdLineArgs[0]);
+
+            int fileExsits = stat(runCommand, &buf);
+            if (fileExsits == 0) {
+                int pid = fork();
+                if (pid == 0) {
+                    char *argsList[tokenNum + 1];
+                    makeArgsList(argsList, cmdLineArgs, tokenNum);
+
+                    int res = execv(runCommand, argsList);
+
+                    if (res == -1) {
+                        printf("The command fails to run due to some unknown reasons.");
+                    }
+                } else {
+                    is_running = 1;
+                    waitpid(pid, &result, 0);
+                    is_running= 0;
+                }
+            } else {
+                printf("\"%s\" not found\n", runCommand);
             }
         }
 
