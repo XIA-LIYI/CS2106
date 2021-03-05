@@ -30,6 +30,7 @@ compute cluster node (Linux on x86)
 #include <stdlib.h>     //for malloc()
 #include <signal.h>
 
+
 int waiting_pid = 0;
 int is_running = 0;
 
