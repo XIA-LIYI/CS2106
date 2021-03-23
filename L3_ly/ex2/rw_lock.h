@@ -15,9 +15,12 @@ for the 2nd member if  you are on a team
 
 //TODO: You can modify the structure
 typedef struct {
+  pthread_mutex_t reader_mutex;
+  pthread_mutex_t writer_mutex;
   pthread_mutex_t mutex;
   int reader_count;
   int writer_count;
+
 } rw_lock;
 
 //Note: You are NOT allowed to change the function headers
