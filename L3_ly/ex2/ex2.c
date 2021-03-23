@@ -16,7 +16,6 @@ void initialise(rw_lock* lock)
   //TODO: modify as needed
   pthread_mutex_init(&(lock->reader_mutex), NULL);
   pthread_mutex_init(&(lock->writer_mutex), NULL);
-  pthread_mutex_init(&(lock->mutex), NULL);
   lock->reader_count = 0;
   lock->writer_count = 0;
 
@@ -25,9 +24,7 @@ void initialise(rw_lock* lock)
 void writer_acquire(rw_lock* lock)
 {
   //TODO: modify as needed
-  pthread_mutex_lock(&(lock->reader_mutex));
   pthread_mutex_lock(&(lock->writer_mutex));
-  //pthread_mutex_lock(&(lock->reader_mutex));
   lock->writer_count++;
 }
 
@@ -36,7 +33,6 @@ void writer_release(rw_lock* lock)
   //TODO: modify as needed
   lock->writer_count--;
   pthread_mutex_unlock(&(lock->writer_mutex)); 
-  pthread_mutex_unlock(&(lock->reader_mutex));
   
 }
 
@@ -44,26 +40,24 @@ void reader_acquire(rw_lock* lock)
 {
   //TODO: modify as needed
   pthread_mutex_lock(&(lock->reader_mutex));
-  pthread_mutex_unlock(&(lock->reader_mutex));
-  pthread_mutex_lock(&(lock->mutex));
   if (lock->reader_count == 0) {
     pthread_mutex_lock(&(lock->writer_mutex));
   }
   lock->reader_count++;
-  pthread_mutex_unlock(&(lock->mutex));
+  pthread_mutex_unlock(&(lock->reader_mutex));
   
 }
 
 void reader_release(rw_lock* lock)
 {
   //TODO: modify as needed
-  pthread_mutex_lock(&(lock->mutex));
+  pthread_mutex_lock(&(lock->reader_mutex));
   lock->reader_count--;
   
   if (lock->reader_count == 0) {
     pthread_mutex_unlock(&(lock->writer_mutex)); 
   }
-  pthread_mutex_unlock(&(lock->mutex));
+  pthread_mutex_unlock(&(lock->reader_mutex));
   
 }
 
@@ -72,5 +66,4 @@ void cleanup(rw_lock* lock)
   //TODO: modify as needed
   pthread_mutex_destroy(&(lock->writer_mutex));
   pthread_mutex_destroy(&(lock->reader_mutex));
-  pthread_mutex_destroy(&(lock->mutex));
 }
