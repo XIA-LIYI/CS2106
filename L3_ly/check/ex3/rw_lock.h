@@ -1,8 +1,18 @@
 /*************************************
 * Lab 3 Exercise 3
-* Name:
-* Student Id: A????????
-* Lab Group: B??
+* Name: Xia Liyi
+* Student Id: A0177873L
+* Lab Group: B19
+*************************************
+Note: Duplicate the above and fill in 
+for the 2nd member if  you are on a team
+*/
+
+/*************************************
+* Lab 3 Exercise 3
+* Name: Zhang Yunjie
+* Student Id: A0204208U
+* Lab Group: B19
 *************************************
 Note: Duplicate the above and fill in 
 for the 2nd member if  you are on a team
