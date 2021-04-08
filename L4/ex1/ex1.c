@@ -106,13 +106,34 @@ void printHeapStatistic()
 
     printf("Total Space: %d bytes\n", hmi.totalSize);
 
+	partInfo* current;
+    int numOfPartitions = 0;
+    int totalOccupiedSize = 0;
+    int numOfHoles = 0;
+    int totalHoleSize = 0;
+	
+	for ( current = hmi.pListHead; current != NULL; 
+		current = current->nextPart){
+
+		printf("[+%5d | %5d bytes | %d]\n", 
+				current->offset, current->size, current->status);
+        if (current->status == 1) {
+            numOfPartitions++;
+            totalOccupiedSize += current -> size;
+        } else {
+            numOfHoles++;
+            totalHoleSize += current -> size;
+        }
+            
+	}
+
    //Remember to preserve the message format!
 
-    printf("Total Occupied Partitions: %d\n", 0);
-    printf("\tTotal Occupied Size: %d bytes\n", 0);
+    printf("Total Occupied Partitions: %d\n", numOfPartitions);
+    printf("\tTotal Occupied Size: %d bytes\n", totalOccupiedSize);
 
-    printf("Total Number of Holes: %d\n", 0);
-    printf("\tTotal Hole Size: %d bytes\n", 0);
+    printf("Total Number of Holes: %d\n", numOfHoles);
+    printf("\tTotal Hole Size: %d bytes\n", totalHoleSize);
 }
 
 int setupHeap(int initialSize)

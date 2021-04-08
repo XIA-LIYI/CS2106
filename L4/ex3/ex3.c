@@ -226,8 +226,14 @@ int setupHeap(int initialSize)
     //       hmi.A <= an array of partition linked list
     //       hmi.maxIdx <= the largest index for hmi.A[]
     //       
-    hmi.A = NULL;   //change this!
-    hmi.maxIdx = 0; //change this!
+
+    int numOfLevels = log2Ceiling(initialSize);
+    hmi.A = (partInfo**) malloc((numOfLevels + 1) * sizeof(partInfo*));
+    for (int i = 0; i < numOfLevels + 1; i++) {
+        hmi.A[i] = NULL;
+    }
+    hmi.maxIdx = numOfLevels;
+    hmi.A[numOfLevels] = buildPartitionInfo(0);
 
     return 1;
 }
