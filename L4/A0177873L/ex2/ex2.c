@@ -1,8 +1,18 @@
 /*************************************
-* Lab 4 Exercise 5
-* Name:
-* Student Id: A????????
-* Lab Group: B??
+* Lab 4 Exercise 2
+* Name: Xia Liyi
+* Student Id: A0177873L
+* Lab Group: B19
+*************************************
+Note: Duplicate the above and fill in 
+for the 2nd member if  you are on a team
+*/
+
+/*************************************
+* Lab 4 Exercise 2
+* Name: Zhang Yunjie
+* Student Id: A0204208U
+* Lab Group: B19
 *************************************
 Note: Duplicate the above and fill in 
 for the 2nd member if  you are on a team
@@ -11,7 +21,6 @@ for the 2nd member if  you are on a team
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <semaphore.h>
 #include "mmalloc.h"
 
 /**********************************************************
@@ -20,14 +29,6 @@ for the 2nd member if  you are on a team
  *  visible only to functions in this file
  *********************************************************/
 static heapMetaInfo hmi;
-
-static sem_t mutex;
-static sem_t mutex2;
-
-static int concurrentMemOp = 0;
-
-int memOpIntegrity = 1;
-
 
 partInfo* buildPartitionInfo(unsigned int offset, int size)
 /**********************************************************
@@ -66,7 +67,7 @@ void printHeapMetaInfo()
  * Print Heap Internal Bookkeeping Information
  *********************************************************/
 {
-	printf("Heap Meta Info:\n");
+	printf("\nHeap Meta Info:\n");
 	printf("===============\n");
 	printf("Total Size = %d bytes\n", hmi.totalSize);
 	printf("Start Address = %p\n", hmi.base);
@@ -108,8 +109,39 @@ void printHeapStatistic()
  * Print Heap Usage Statistics
  *********************************************************/
 {
+    //TODO: Calculate and report the various statistics
 
-    //Not used in this exercise
+    printf("\nHeap Usage Statistics:\n");
+    printf("======================\n");
+
+    printf("Total Space: %d bytes\n", hmi.totalSize);
+
+	partInfo* current;
+    int numOfPartitions = 0;
+    int totalOccupiedSize = 0;
+    int numOfHoles = 0;
+    int totalHoleSize = 0;
+	
+	for ( current = hmi.pListHead; current != NULL; 
+		current = current->nextPart){
+            
+        if (current->status == 1) {
+            numOfPartitions++;
+            totalOccupiedSize += current -> size;
+        } else {
+            numOfHoles++;
+            totalHoleSize += current -> size;
+        }
+            
+	}
+
+   //Remember to preserve the message format!
+
+    printf("Total Occupied Partitions: %d\n", numOfPartitions);
+    printf("\tTotal Occupied Size: %d bytes\n", totalOccupiedSize);
+
+    printf("Total Number of Holes: %d\n", numOfHoles);
+    printf("\tTotal Hole Size: %d bytes\n", totalHoleSize);
 }
 
 int setupHeap(int initialSize)
@@ -131,8 +163,6 @@ int setupHeap(int initialSize)
     //Setup the very first partition info structure
 	hmi.pListHead = buildPartitionInfo( 0, initialSize );
 	
-    //Setup Mutex for internal checking
-    sem_init( &mutex, 0, 1 );
 	return 1;
 }
 
@@ -163,32 +193,6 @@ void splitPart(partInfo *bigPart, int newSize)
 
 }
 
-void memOpStart()
-/**********************************************************
- * Internal checking mechanism to detect race condition
- * Should be called at the start of a memory operation
- * MUST call the memOpEnd() at the end
- *********************************************************/
-{    
-    sem_wait( &mutex );
-    concurrentMemOp++;
-    sem_post( &mutex );
-}
-
-void memOpEnd()
-/**********************************************************
- * Internal checking mechanism to detect race condition
- *********************************************************/
-{    
-    sem_wait( &mutex );
-    if (concurrentMemOp > 1){
-        memOpIntegrity = 0;
-    }
-    concurrentMemOp--;
-    sem_post( &mutex );
-}
-
-
 void* mymalloc(int size)
 /**********************************************************
  * Mimic the normal "malloc()":
@@ -197,12 +201,10 @@ void* mymalloc(int size)
  *    Return NULL otherwise 
  *********************************************************/
 {
+    //TODO: Modify the allocation algoritm from First-Fit to
+    //       Best-Fit
 
-    //Checking for race condition
-    sem_wait( &mutex2 );
-    memOpStart();
-
-    partInfo *current = hmi.pListHead;
+	partInfo *current = hmi.pListHead;
 
     //We need to make sure the size is word
     // aligned, i.e. if the word size is 4 bytes, the size need to be
@@ -214,35 +216,39 @@ void* mymalloc(int size)
     //  - Dddition of 4 round up to the next multiple 
     //  - subtraction take care of the case where size is already multiples of 4. 
     //This can be achieved via bitwise operation too.
+
+    partInfo *best = NULL;
+
     size = (size - 1) / 4 * 4 + 4;
  
-    //First-fit algorithm
-	while ( current != NULL && 
-			(current->status == OCCUPIED || current->size < size) ){
-
+    //Best-fit algorithm
+	while ( current != NULL){
+        if (current->status == OCCUPIED) {
+            current = current->nextPart;
+            continue;
+        }
+        if (current->size >= size) {
+            if (best == NULL) {
+                best = current;
+            } else if (current->size < best->size) {
+                best = current;
+            }
+        }
 		current = current->nextPart;
 	}
 
-    if (current == NULL){	//heap full
-        //Check for race condition
-        memOpEnd();
-        sem_post( &mutex2 );
-	    return NULL;
+    if (best == NULL){	//heap full
+		return NULL;
 	}
-
 
 	//Do we need to split the partition?
-	if (current->size > size) {
-		splitPart(current, size);
+	if (best->size > size) {
+		splitPart(best, size);
 	}
 
-	current->status = OCCUPIED;
-
-    //Check for race condition
-    memOpEnd();
-    sem_post( &mutex2 );
-
-	return hmi.base + current->offset;
+	best->status = OCCUPIED;
+	
+	return (void*)hmi.base + best->offset;
 }
 
 void myfree(void* address)
@@ -254,10 +260,6 @@ void myfree(void* address)
 	partInfo *toBeFreed;
     int partID;
 
-    //Checking for race condition
-    sem_wait( &mutex2 );
-    memOpStart();
-    
     //Use the offset as a unique ID to look for the right partition
  	partID = address - hmi.base;
     
@@ -272,15 +274,12 @@ void myfree(void* address)
     //Should not happen in this lab as we free only correct adddresses
     if (toBeFreed == NULL) {
         printf("MyFree(%p) failed! Exiting.\n", address);
-        memOpEnd();
-        sem_post( &mutex2 );
         exit(1);
     }
 
     //Very simple handling, just set the partition to FREE
     toBeFreed->status = FREE;
 
-    //Check for race condition
-    memOpEnd();
-    sem_post( &mutex2 );
+    //If this is a full implementation, what should we do with freed partition?
+
 }
