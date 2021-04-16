@@ -124,9 +124,7 @@ void printHeapStatistic()
 	
 	for ( current = hmi.pListHead; current != NULL; 
 		current = current->nextPart){
-
-		printf("[+%5d | %5d bytes | %d]\n", 
-				current->offset, current->size, current->status);
+            
         if (current->status == 1) {
             numOfPartitions++;
             totalOccupiedSize += current -> size;
