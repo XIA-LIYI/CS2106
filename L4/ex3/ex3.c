@@ -1,8 +1,18 @@
 /*************************************
 * Lab 4 Exercise 3
-* Name:
-* Student Id: A????????
-* Lab Group: B??
+* Name: Xia Liyi
+* Student Id: A0177873L
+* Lab Group: B19
+*************************************
+Note: Duplicate the above and fill in 
+for the 2nd member if  you are on a team
+*/
+
+/*************************************
+* Lab 4 Exercise 3
+* Name: Zhang Yunjie
+* Student Id: A0204208U
+* Lab Group: B19
 *************************************
 Note: Duplicate the above and fill in 
 for the 2nd member if  you are on a team
@@ -206,6 +216,7 @@ void addPartitionAtLevel( unsigned int lvl, unsigned int offset )
  *      at higher level
  *********************************************************/
 {
+    // My implementation is to add a partition with offset sorted.
     partInfo* curr = hmi.A[lvl];
     if (curr == NULL) {
         hmi.A[lvl] = buildPartitionInfo(offset);
@@ -238,6 +249,8 @@ partInfo* removePartitionAtLevel(unsigned int lvl)
  * Return the Partition Structure if found.
  *********************************************************/
 {
+    // My implementation is only about remove the first element from current level
+    // because it is sorted by offset when adding the partition.
     if (hmi.A[lvl] == NULL) {
         return NULL;
     }
@@ -286,6 +299,9 @@ int setupHeap(int initialSize)
 }
 
 void allocateMemory(int lvl) {
+    // My idea is to check whether current level has accessible memory.
+    // If yes, break it into two parts and give it to lower level.
+    // If no, ask for higher level.
     partInfo* removed = removePartitionAtLevel(lvl);
     if (removed == NULL) {
         allocateMemory(lvl + 1);
@@ -323,6 +339,7 @@ void* mymalloc(int size)
 }
 
 int checkPartitionAtLevel(int lvl, int offset) {
+    // This is to check whether level lvl has a partition with offset.
     partInfo* curr = hmi.A[lvl];
     while (curr != NULL) {
         if (curr -> offset == offset) {
@@ -334,6 +351,7 @@ int checkPartitionAtLevel(int lvl, int offset) {
 }
 
 void removePartitionAtLevelWithOffset(int lvl, int offset) {
+    // This is to remove the partition with offset in level lvl.
     partInfo* curr = hmi.A[lvl];
     if (curr -> offset == offset) {
         hmi.A[lvl] = curr -> nextPart;
@@ -358,6 +376,10 @@ int getMinOffset(int a, int b) {
 }
 
 void freeMemory(int lvl, int offset) {
+    // The idea is to check whether the offset has a buddy in this level.
+    // If yes, remove both of them and add a new bigger partition to higher level and call recursion.
+    // If no, add this free partition in current level.
+    // If it has been added before, finish and return nothing.
     int buddyOffset = buddyOf((unsigned int) hmi.base + offset, lvl) - (unsigned int) hmi.base;
     
     if (checkPartitionAtLevel(lvl, buddyOffset) == 0) {
